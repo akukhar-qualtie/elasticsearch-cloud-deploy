@@ -166,3 +166,8 @@ variable "DEV_MODE_scripts_s3_bucket" {
   description = "S3 bucket to override init scripts from. Should not be used on production."
   default     = ""
 }
+
+variable "s3_endpoint_enabled" {
+  description = "Whether or not to create S3 endpoint inside the VPC."
+  default     = true
+}

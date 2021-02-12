@@ -69,6 +69,7 @@ resource "aws_vpc_endpoint" "autoscaling" {
 }
 
 resource "aws_vpc_endpoint" "s3" {
+  count             = var.s3_endpoint_enabled ? 1 : 0
   vpc_id            = var.vpc_id
   service_name      = "com.amazonaws.${var.aws_region}.s3"
   vpc_endpoint_type = "Gateway"
