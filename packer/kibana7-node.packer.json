@@ -13,6 +13,7 @@
       "run_tags": {
         "role": "packer"
       },
+      "subnet_id": "{{user `subnet_id`}}",
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
