@@ -36,6 +36,11 @@ resource "aws_security_group" "vpc-endpoint" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name    = "${var.es_cluster}-endpoint-sg"
+    cluster = var.es_cluster
+  }
 }
 
 resource "aws_vpc_endpoint" "ec2" {
@@ -51,6 +56,11 @@ resource "aws_vpc_endpoint" "ec2" {
     [local.singlenode_subnet_id],
     [local.bootstrap_node_subnet_id]
   ))
+
+  tags = {
+    Name    = "${var.es_cluster}-endpoint-ec2"
+    cluster = var.es_cluster
+  }
 }
 
 resource "aws_vpc_endpoint" "autoscaling" {
@@ -66,6 +76,11 @@ resource "aws_vpc_endpoint" "autoscaling" {
     [local.singlenode_subnet_id],
     [local.bootstrap_node_subnet_id]
   ))
+
+  tags = {
+    Name    = "${var.es_cluster}-endpoint-autoscaling"
+    cluster = var.es_cluster
+  }
 }
 
 resource "aws_vpc_endpoint" "s3" {
@@ -74,4 +89,9 @@ resource "aws_vpc_endpoint" "s3" {
   service_name      = "com.amazonaws.${var.aws_region}.s3"
   vpc_endpoint_type = "Gateway"
   route_table_ids   = data.aws_route_tables.vpc_route_tables.ids
+
+  tags = {
+    Name    = "${var.es_cluster}-endpoint-s3"
+    cluster = var.es_cluster
+  }
 }
