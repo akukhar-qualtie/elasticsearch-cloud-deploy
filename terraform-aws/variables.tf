@@ -161,8 +161,13 @@ variable "filebeat_monitoring_host" {
 }
 
 variable "s3_backup_bucket" {
-  description = "S3 bucket for backups"
+  description = "S3 bucket for indices backups."
   default     = ""
+}
+
+variable "delete_backup_bucket" {
+  description = "[DANGER] Force delete S3 bucket and objects without recover."
+  default     = false
 }
 
 variable "alb_subnets" {
