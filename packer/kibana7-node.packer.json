@@ -10,9 +10,6 @@
       "iam_instance_profile": "packer",
       "instance_type": "t2.medium",
       "region": "{{user `aws_region`}}",
-      "run_tags": {
-        "role": "packer"
-      },
       "subnet_id": "{{user `subnet_id`}}",
       "source_ami_filter": {
         "filters": {

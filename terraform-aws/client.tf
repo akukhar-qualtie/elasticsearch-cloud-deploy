@@ -2,7 +2,7 @@ data "template_file" "client_userdata_script" {
   template = file("${path.module}/../templates/aws_user_data.sh")
   vars = merge(local.user_data_common, {
     startup_script = "client.sh",
-    heap_size = var.client_heap_size
+    heap_size      = var.client_heap_size
   })
 }
 
@@ -35,12 +35,13 @@ resource "aws_launch_template" "client" {
 resource "aws_autoscaling_group" "client_nodes" {
   count = length(keys(var.clients_count))
 
-  name               = "elasticsearch-${var.es_cluster}-client-nodes-${keys(var.clients_count)[count.index]}"
-  max_size           = var.clients_count[keys(var.clients_count)[count.index]]
-  min_size           = var.clients_count[keys(var.clients_count)[count.index]]
-  desired_capacity   = var.clients_count[keys(var.clients_count)[count.index]]
-  default_cooldown   = 30
-  force_delete       = true
+  name              = "elasticsearch-${var.es_cluster}-client-nodes-${keys(var.clients_count)[count.index]}"
+  max_size          = var.clients_count[keys(var.clients_count)[count.index]]
+  min_size          = var.clients_count[keys(var.clients_count)[count.index]]
+  desired_capacity  = var.clients_count[keys(var.clients_count)[count.index]]
+  default_cooldown  = 30
+  force_delete      = true
+  health_check_type = var.health_check_type
 
   vpc_zone_identifier = local.clients_subnet_ids[keys(var.clients_count)[count.index]]
 

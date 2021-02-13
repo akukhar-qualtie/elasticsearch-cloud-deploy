@@ -48,6 +48,11 @@ variable "elasticsearch_volume_size" {
   default = "100" # gb
 }
 
+variable "health_check_type" {
+  description = "Controls how health checking is done. Must be one of EC2 or ELB."
+  default     = "EC2"
+}
+
 variable "volume_encryption" {
   default = true
 }
