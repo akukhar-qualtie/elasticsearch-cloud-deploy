@@ -165,35 +165,39 @@ resource "aws_lb_listener" "esearch-https" {
   port              = 443
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = var.domain_cert
+
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.esearch-p9200-tg.arn
+    target_group_arn = aws_lb_target_group.kibana-p5601-tg.arn
   }
 }
 
-resource "aws_lb_listener_rule" "kibana" {
-  listener_arn = aws_lb_listener.esearch-https.arn
-  priority     = 10
-  action {
-    type = "redirect"
-    redirect {
-      port        = 5601
-      status_code = "HTTP_301"
-      host        = aws_route53_record.elk.fqdn
-      path        = "/_plugin/kibana"
-    }
-  }
-  condition {
-    path_pattern {
-      values = ["/kibana"]
-    }
-  }
-}
+#resource "aws_lb_listener_rule" "kibana" {
+#  listener_arn = aws_lb_listener.esearch-https.arn
+#  priority     = 10
+#  action {
+#    type = "redirect"
+#    redirect {
+#      port        = 5601
+#      protocol    = "HTTPS"
+#      status_code = "HTTP_301"
+#      host        = aws_route53_record.elk.fqdn
+#      path        = "/"
+#    }
+#  }
+#  condition {
+#    path_pattern {
+#      values = ["/kibana"]
+#    }
+#  }
+#}
 
 resource "aws_lb_listener" "esearch" {
   load_balancer_arn = aws_lb.elasticsearch-alb.arn
-  port              = "9200"
-  protocol          = "HTTP"
+  protocol          = "HTTPS"
+  port              = 9200
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.domain_cert
 
   default_action {
     type             = "forward"
@@ -203,8 +207,10 @@ resource "aws_lb_listener" "esearch" {
 
 resource "aws_lb_listener" "kibana" {
   load_balancer_arn = aws_lb.elasticsearch-alb.arn
-  port              = "5601"
-  protocol          = "HTTP"
+  port              = 5601
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.domain_cert
 
   default_action {
     type             = "forward"
@@ -214,8 +220,10 @@ resource "aws_lb_listener" "kibana" {
 
 resource "aws_lb_listener" "grafana" {
   load_balancer_arn = aws_lb.elasticsearch-alb.arn
-  port              = "3000"
-  protocol          = "HTTP"
+  port              = 3000
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.domain_cert
 
   default_action {
     type             = "forward"
@@ -225,8 +233,10 @@ resource "aws_lb_listener" "grafana" {
 
 resource "aws_lb_listener" "cerebro" {
   load_balancer_arn = aws_lb.elasticsearch-alb.arn
-  port              = "9000"
-  protocol          = "HTTP"
+  port              = 9000
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.domain_cert
 
   default_action {
     type             = "forward"
