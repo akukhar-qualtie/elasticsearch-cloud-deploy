@@ -53,6 +53,24 @@ variable "health_check_type" {
   default     = "EC2"
 }
 
+variable "domain_cert" {
+  description = "Use ACM certificate to sevice ES endpoint on 443 port."
+  type        = string
+  default     = ""
+}
+
+variable "zone_id" {
+  description = "Route53 record for ES endpoint will be placed in this zone."
+  type        = string
+  default     = ""
+}
+
+variable "elk_subdomain" {
+  description = "ES service endpoint."
+  type        = string
+  default     = ""
+}
+
 variable "volume_encryption" {
   default = true
 }

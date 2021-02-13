@@ -3,6 +3,22 @@ resource "aws_security_group" "elasticsearch-alb-sg" {
   description = "ElasticSearch Ports for ALB Access"
   vpc_id      = var.vpc_id
 
+  # allow http
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # allow https
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # allow Kibana port access
   ingress {
     from_port   = 5601
@@ -116,7 +132,7 @@ resource "aws_lb_target_group" "cerebro-p9000-tg" {
 
 resource "aws_lb" "elasticsearch-alb" {
   name               = "${var.es_cluster}-alb"
-  internal           = ! var.public_facing
+  internal           = !var.public_facing
   load_balancer_type = "application"
   security_groups    = [aws_security_group.elasticsearch-alb-sg.id]
   subnets            = coalescelist(var.alb_subnets, tolist(data.aws_subnet_ids.all-subnets.ids))
@@ -128,6 +144,51 @@ resource "aws_lb" "elasticsearch-alb" {
 
 # ALB Listeners and Listener Rules
 #-----------------------------------------------------
+
+resource "aws_lb_listener" "redirect" {
+  load_balancer_arn = aws_lb.elasticsearch-alb.arn
+  protocol          = "HTTP"
+  port              = 80
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = 443
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "esearch-https" {
+  load_balancer_arn = aws_lb.elasticsearch-alb.arn
+  protocol          = "HTTPS"
+  port              = 443
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.domain_cert
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.esearch-p9200-tg.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "kibana" {
+  listener_arn = aws_lb_listener.esearch-https.arn
+  priority     = 10
+  action {
+    type = "redirect"
+    redirect {
+      port        = 5601
+      status_code = "HTTP_301"
+      host        = aws_route53_record.elk.fqdn
+      path        = "/_plugin/kibana"
+    }
+  }
+  condition {
+    path_pattern {
+      values = ["/kibana"]
+    }
+  }
+}
 
 resource "aws_lb_listener" "esearch" {
   load_balancer_arn = aws_lb.elasticsearch-alb.arn
