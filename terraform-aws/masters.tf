@@ -1,5 +1,5 @@
 data "local_file" "cluster_bootstrap_state" {
-  filename = "${path.module}/cluster_bootstrap_state"
+  filename = var.cluster_bootstrap_state_file
 }
 
 data "template_file" "master_userdata_script" {
@@ -119,11 +119,11 @@ resource "aws_instance" "bootstrap_node" {
 
 resource "null_resource" "cluster_bootstrap_state" {
   provisioner "local-exec" {
-    command = "printf 1 > ${path.module}/cluster_bootstrap_state"
+    command = "printf 1 > var.cluster_bootstrap_state_file"
   }
   provisioner "local-exec" {
     when    = destroy
-    command = "printf 0 > ${path.module}/cluster_bootstrap_state"
+    command = "printf 0 > var.cluster_bootstrap_state_file"
   }
 
   depends_on = [aws_instance.bootstrap_node]

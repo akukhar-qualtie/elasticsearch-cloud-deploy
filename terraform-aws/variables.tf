@@ -185,6 +185,11 @@ variable "bootstrap_node_subnet_id" {
   default     = ""
 }
 
+variable "cluster_bootstrap_state_file" {
+  description = "Location of cluster_bootstrap_state file"
+  default     = "./elk/cluster_bootstrap_state"
+}
+
 variable "use_g1gc" {
   description = "Whether or not to enable G1GC in jvm.options ES config"
   default     = false
